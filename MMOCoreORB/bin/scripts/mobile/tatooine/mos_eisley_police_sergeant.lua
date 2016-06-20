@@ -41,7 +41,7 @@ mos_eisley_police_sergeant = Creature:new {
 			lootChance = 10000000
 		}
 	},
-	weapons = {"rebel_weapons_light"},
+	weapons = {"imperial_weapons_light"},
 	conversationTemplate = "",
 	reactionStf = "@npc_reaction/townperson",
 	attacks = merge(brawlermid,marksmanmid)

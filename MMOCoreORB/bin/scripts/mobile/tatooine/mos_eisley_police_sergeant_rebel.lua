@@ -1,16 +1,16 @@
-mos_eisley_police_lieutenant = Creature:new {
-	objectName = "@mob/creature_names:mos_eisley_police_lieutenant",
+mos_eisley_police_sergeant_rebel = Creature:new {
+	objectName = "@mob/creature_names:mos_eisley_police_sergeant",
 	randomNameType = NAME_GENERIC,
 	randomNameTag = true,
-	socialGroup = "imperial",
-	faction = "imperial",
-	level = 15,
-	chanceHit = 0.31,
-	damageMin = 160,
-	damageMax = 170,
-	baseXp = 831,
-	baseHAM = 2400,
-	baseHAMmax = 3000,
+	socialGroup = "rebel",
+	faction = "rebel",
+	level = 14,
+	chanceHit = 0.3,
+	damageMin = 150,
+	damageMax = 160,
+	baseXp = 714,
+	baseHAM = 2000,
+	baseHAMmax = 2400,
 	armor = 0,
 	resists = {0,0,0,0,0,0,0,0,-1},
 	meatType = "",
@@ -27,7 +27,7 @@ mos_eisley_police_lieutenant = Creature:new {
 	optionsBitmask = AIENABLED,
 	diet = HERBIVORE,
 
-	templates = {"object/mobile/dressed_tatooine_mos_eisley_police_officer.iff"},
+	templates = {"object/mobile/dressed_tatooine_mos_eisley_police_sergeant.iff"},
 	lootGroups = {
 		{
 			groups = {
@@ -37,14 +37,13 @@ mos_eisley_police_lieutenant = Creature:new {
 				{group = "melee_weapons", chance = 1000000},
 				{group = "carbines", chance = 1000000},
 				{group = "wearables_common", chance = 1000000}
-			},
-			lootChance = 10000000
+			}
 		}
 	},
-	weapons = {"imperial_weapons_light"},
+	weapons = {"rebel_weapons_light"},
 	conversationTemplate = "",
 	reactionStf = "@npc_reaction/townperson",
 	attacks = merge(brawlermid,marksmanmid)
 }
 
-CreatureTemplates:addCreatureTemplate(mos_eisley_police_lieutenant, "mos_eisley_police_lieutenant")
+CreatureTemplates:addCreatureTemplate(mos_eisley_police_sergeant_rebel, "mos_eisley_police_sergeant_rebel")

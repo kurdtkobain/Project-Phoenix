@@ -1,9 +1,9 @@
-mos_taike_veteran_guard = Creature:new {
-	objectName = "@mob/creature_names:mos_taike_guard_old",
+mos_taike_cantina_owner_rebel = Creature:new {
+	objectName = "@mob/creature_names:mos_taike_cantina_owner",
 	randomNameType = NAME_GENERIC,
 	randomNameTag = true,
-	socialGroup = "imperial",
-	faction = "imperial",
+	socialGroup = "rebel",
+	faction = "rebel",
 	level = 21,
 	chanceHit = 0.33,
 	damageMin = 190,
@@ -12,7 +12,7 @@ mos_taike_veteran_guard = Creature:new {
 	baseHAM = 5900,
 	baseHAMmax = 7200,
 	armor = 0,
-	resists = {20,20,0,-1,0,-1,0,-1,-1},
+	resists = {20,20,-1,0,0,-1,0,-1,-1},
 	meatType = "",
 	meatAmount = 0,
 	hideType = "",
@@ -27,9 +27,9 @@ mos_taike_veteran_guard = Creature:new {
 	optionsBitmask = AIENABLED,
 	diet = HERBIVORE,
 
-	templates = {"object/mobile/mos_taike_guard_old.iff"},
-	lootGroups = {
-		{
+	templates = {"object/mobile/mos_taike_cantina_owner.iff"},
+		lootGroups = {
+			{
 			groups = {
 				{group = "junk", chance = 5000000},
 				{group = "rifles", chance = 1000000},
@@ -41,10 +41,10 @@ mos_taike_veteran_guard = Creature:new {
 		}
 	},
 	weapons = {},
-	outfit = "mos_taike_guard_old_outfit",
+	outfit = "mos_taike_guard_outfit",
 	conversationTemplate = "",
 	reactionStf = "@npc_reaction/townperson",
 	attacks = merge(brawlermaster,marksmanmaster)
 }
 
-CreatureTemplates:addCreatureTemplate(mos_taike_veteran_guard, "mos_taike_veteran_guard")
+CreatureTemplates:addCreatureTemplate(mos_taike_cantina_owner_rebel, "mos_taike_cantina_owner_rebel")

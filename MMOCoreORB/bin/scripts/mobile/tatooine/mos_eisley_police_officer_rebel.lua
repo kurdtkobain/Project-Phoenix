@@ -1,9 +1,9 @@
-mos_entha_police_officer = Creature:new {
-	objectName = "@mob/creature_names:mos_entha_police_officer",
+mos_eisley_police_officer_rebel = Creature:new {
+	objectName = "@mob/creature_names:mos_eisley_police_officer",
 	randomNameType = NAME_GENERIC,
 	randomNameTag = true,
-	socialGroup = "imperial",
-	faction = "imperial",
+	socialGroup = "rebel",
+	faction = "rebel",
 	level = 13,
 	chanceHit = 0.3,
 	damageMin = 140,
@@ -27,7 +27,8 @@ mos_entha_police_officer = Creature:new {
 	optionsBitmask = AIENABLED,
 	diet = HERBIVORE,
 
-	templates = {"object/mobile/dressed_eisley_officer_aqualish_female_01.iff",
+	templates = {
+		"object/mobile/dressed_eisley_officer_aqualish_female_01.iff",
 		"object/mobile/dressed_eisley_officer_aqualish_male_01.iff",
 		"object/mobile/dressed_eisley_officer_bothan_female_01.iff",
 		"object/mobile/dressed_eisley_officer_bothan_male_01.iff",
@@ -51,14 +52,13 @@ mos_entha_police_officer = Creature:new {
 				{group = "melee_weapons", chance = 1000000},
 				{group = "carbines", chance = 1000000},
 				{group = "wearables_common", chance = 1000000}
-			},
-			lootChance = 10000000
+			}
 		}
 	},
-	weapons = {"imperial_weapons_light"},
+	weapons = {"rebel_weapons_light"},
 	conversationTemplate = "",
 	reactionStf = "@npc_reaction/townperson",
 	attacks = merge(brawlermid,marksmanmid)
 }
 
-CreatureTemplates:addCreatureTemplate(mos_entha_police_officer, "mos_entha_police_officer")
+CreatureTemplates:addCreatureTemplate(mos_eisley_police_officer_rebel, "mos_eisley_police_officer_rebel")

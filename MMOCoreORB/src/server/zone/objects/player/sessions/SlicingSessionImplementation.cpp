@@ -138,7 +138,7 @@ void SlicingSessionImplementation::generateSliceMenu(SuiListBox* suiBox) {
 		else
 			prompt << progress;
 		
-		if(!firstRun){
+		if(!firstRun || tangibleObject->isContainerObject() || tangibleObject->isMissionTerminal()){
 
 			suiBox->addMenuItem("@slicing/slicing:blue_cable", 0);
 			suiBox->addMenuItem("@slicing/slicing:red_cable", 1);

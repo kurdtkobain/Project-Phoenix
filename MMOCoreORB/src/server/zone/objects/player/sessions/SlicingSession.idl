@@ -40,6 +40,7 @@ class SlicingSession extends Facade {
 	protected byte sliceOption;
 	
 	protected boolean selectSlice;
+	protected boolean firstRun;
 
 	protected boolean baseSlice;
 		

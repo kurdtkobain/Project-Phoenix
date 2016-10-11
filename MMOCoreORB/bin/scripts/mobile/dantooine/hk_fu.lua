@@ -1,16 +1,16 @@
-apocalypse = Creature:new {
+hk_fu = Creature:new {
 	objectName = "@mob/creature_names:",
-	customName = "Apocalypse (World Devourer)",
+	customName = "hk_fu (Meatbag Popper)",
 	socialGroup = "self",
 	pvpFaction = "",
 	faction = "",
 	level = 300,
 	chanceHit = 75,
-	damageMin = 7700,
-	damageMax = 7900,
+	damageMin = 7900,
+	damageMax = 8100,
 	baseXp = 435409,
-	baseHAM = 22000000,
-	baseHAMmax = 22100000,
+	baseHAM = 25000000,
+	baseHAMmax = 26000000,
 	armor = 3,
 	resists = {90,90,90,90,90,90,90,90,90},
 	meatType = "",
@@ -27,103 +27,102 @@ apocalypse = Creature:new {
 	optionsBitmask = AIENABLED + INTERESTING,
 	diet = HERBIVORE,
 
-	templates = {
-		"object/mobile/dressed_aakuan_keeper_zabrak_female_01.iff",
-		"object/mobile/dressed_aakuan_warder_zabrak_female_01.iff"},
+templates = {"object/mobile/som/hk47.iff"},
+
 	lootGroups = {
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "g_carbine_alliance_needler", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "g_carbine_bounty_ee3", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "g_carbine_charric", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "g_carbine_geo", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "g_carbine_mandalorian", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "g_carbine_proton", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "g_pistol_deathhammer", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "g_pistol_flechette", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "g_pistol_heroic_exar", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "g_pistol_intimidator", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "g_pistol_mandalorian", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "g_rifle_bowcaster_master", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "g_rifle_deathtroopers", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "g_rifle_eweb", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "g_rifle_geo_drill", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "g_rifle_mandalorian", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
@@ -135,32 +134,32 @@ apocalypse = Creature:new {
 		},
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "g_som_rifle_mustafar_disruptor", chance = 10000000}
 			},
 			lootChance = 10000000
 		 },
 			{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "g_rifle_proton", chance = 10000000}
 			},
 			lootChance = 10000000
 		 },
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "g_ep3_loot_retaliation", chance = 10000000}
 			},
 			lootChance = 10000000
 		 },
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "g_ep3_loot_retribution", chance = 10000000}
 			},
 			lootChance = 10000000
 		 },
 		},	
-	weapons = {"imperial_weapons_heavy"},
 	reactionStf = "@npc_reaction/slang",
-	attacks = merge(bountyhuntermaster,marksmanmaster,brawlermaster,pikemanmaster,fencermaster,swordsmanmaster,tkamaster,pistoleermaster,commandomaster)
+	defaultWeapon = "object/weapon/ranged/droid/droid_droideka_ranged.iff",
+	defaultAttack = "creaturerangedattack"
 }
 
-CreatureTemplates:addCreatureTemplate(apocalypse, "apocalypse")
+CreatureTemplates:addCreatureTemplate(hk_fu, "hk_fu")

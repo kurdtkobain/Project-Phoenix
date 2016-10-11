@@ -1,16 +1,16 @@
-apocalypse = Creature:new {
+milliana = Creature:new {
 	objectName = "@mob/creature_names:",
-	customName = "Apocalypse (World Devourer)",
+	customName = "Milliana (Armored Goddess)",
 	socialGroup = "self",
 	pvpFaction = "",
 	faction = "",
 	level = 300,
-	chanceHit = 75,
+	chanceHit = 85,
 	damageMin = 7700,
 	damageMax = 7900,
-	baseXp = 435409,
-	baseHAM = 22000000,
-	baseHAMmax = 22100000,
+	baseXp = 1435409,
+	baseHAM = 25000000,
+	baseHAMmax = 25100000,
 	armor = 3,
 	resists = {90,90,90,90,90,90,90,90,90},
 	meatType = "",
@@ -33,97 +33,97 @@ apocalypse = Creature:new {
 	lootGroups = {
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "acklay", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "acklay", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "acklay", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "acklay", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "acklay", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "geonosian_cubes", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "geonosian_cubes", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "geonosian_cubes", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "geonosian_cubes", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "geonosian_cubes", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "geonosian_cubes", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "wep_comps", chance = 10000000}
+				{group = "janta_rare", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "janta_rare", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "janta_rare", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "janta_rare", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "janta_rare", chance = 10000000}
 			},
 			lootChance = 10000000
 		},
@@ -135,25 +135,31 @@ apocalypse = Creature:new {
 		},
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "nightsister_common", chance = 10000000}
 			},
 			lootChance = 10000000
 		 },
 			{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "nightsister_common", chance = 10000000}
 			},
 			lootChance = 10000000
 		 },
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "nightsister_common", chance = 10000000}
 			},
 			lootChance = 10000000
 		 },
 		{
 			groups = {
-				{group = "geo_spider_fang", chance = 10000000}
+				{group = "nightsister_common", chance = 10000000}
+			},
+			lootChance = 10000000
+		 },
+		{
+			groups = {
+				{group = "nightsister_common", chance = 10000000}
 			},
 			lootChance = 10000000
 		 },
@@ -163,4 +169,4 @@ apocalypse = Creature:new {
 	attacks = merge(bountyhuntermaster,marksmanmaster,brawlermaster,pikemanmaster,fencermaster,swordsmanmaster,tkamaster,pistoleermaster,commandomaster)
 }
 
-CreatureTemplates:addCreatureTemplate(apocalypse, "apocalypse")
+CreatureTemplates:addCreatureTemplate(milliana, "milliana")

@@ -1,5 +1,6 @@
 package.path = package.path .. ";scripts/screenplays/themepark/?.lua;scripts/screenplays/?.lua;scripts/screenplays/dungeon/corellian_corvette/?.lua"
 require("screenplay")
+require("conv_handler")
 require("themeParkLogic")
 require("screenplayHelper")
 require("corvetteTicketGiverLogic")
@@ -197,7 +198,7 @@ includeFile("events/lifeDay.lua")
 includeFile("events/buffTerminalMenuComponent.lua")
 includeFile("events/race_droid.lua")
 includeFile("events/black_sun.lua")
-includeFile("events/spirit_exar.lua")
+--includeFile("events/spirit_exar.lua")
 includeFile("events/world_exchange_dealer.lua")
 
 -- Hero of Tatooine
@@ -525,7 +526,7 @@ includeFile("tests/tests.lua")
 includeFile("poi/kaas_imperial_garrison.lua")
 
 --Boss Encounters
-includeFile("poi/tatooine_tsking.lua")
+--includeFile("poi/tatooine_tsking.lua")
 includeFile("poi/lok_rvboss.lua")
 
 ---- Merchants
@@ -534,9 +535,13 @@ includeFile("hondo/merchants/housing_iken_wilyens.lua")
 includeFile("hondo/merchants/housing_duag_hauser.lua")
 includeFile("hondo/merchants/housing_mlo_lemo.lua")
 includeFile("hondo/merchants/vehicles_crazy_larry.lua")
-includeFile("hondo/merchants/facilities_industra_baggins.lua") includeFile("hondo/merchants/helper_u8l7.lua")
+includeFile("hondo/merchants/facilities_industra_baggins.lua")
+includeFile("hondo/merchants/helper_u8l7.lua")
 includeFile("hondo/merchants/armor_volrik_lonugs.lua")
-includeFile("hondo/merchants/armor_jabba_eaht_skcus.lua") includeFile("hondo/merchants/armor_jabba_nal_yaro.lua") includeFile("hondo/merchants/armor_jabba_cyan_yaro.lua") includeFile("hondo/merchants/weapons_yivvits.lua")
+includeFile("hondo/merchants/armor_jabba_eaht_skcus.lua")
+includeFile("hondo/merchants/armor_jabba_nal_yaro.lua")
+includeFile("hondo/merchants/armor_jabba_cyan_yaro.lua")
+includeFile("hondo/merchants/weapons_yivvits.lua")
 includeFile("hondo/merchants/john_connor.lua")
 
 --Faction Screenplays Rebel / Imperial

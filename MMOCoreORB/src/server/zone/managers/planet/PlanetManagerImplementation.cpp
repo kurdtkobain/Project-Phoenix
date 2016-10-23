@@ -551,7 +551,7 @@ void PlanetManagerImplementation::loadClientRegions() {
 
 	DataTableIff dtiff;
 	dtiff.readObject(iffStream);
-
+	
 	for (int i = 0; i < dtiff.getTotalRows(); ++i) {
 		String regionName;
 		float x, y, radius;

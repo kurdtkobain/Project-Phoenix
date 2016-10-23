@@ -93,7 +93,7 @@ AABBTree* CollisionManager::getAABBTree(SceneObject* scno, int collisionBlockFla
 			return NULL;
 
 		mesh = dynamic_cast<MeshAppearanceTemplate*>(appTemplate->getFirstMesh());
-	}
+}
 
 	if (mesh == NULL)
 		return NULL;
@@ -128,18 +128,23 @@ bool CollisionManager::checkSphereCollision(const Vector3& origin, float radius,
 			//moving ray to model space
 
 			try {
-				Sphere sphere(convertToModelSpace(sphereOrigin, scno), radius);
+			Sphere sphere(convertToModelSpace(sphereOrigin, scno), radius);
 				//structure->info("checking ray with building dir" + String::valueOf(structure->getDirectionAngle()), true);
 
 				if (aabbTree->testCollide(sphere)) {
 					return true;
-				}
-			} catch (Exception& e) {
-				scno->error(e.getMessage());
-			} catch (...) {
-				throw;
+			} else {
+				auto appearanceTemplate = templateObject->getAppearanceTemplate();
+
+				if(appearanceTemplate && appearanceTemplate->testCollide(sphere))
+					return true;
 			}
+		} catch (Exception& e) {
+				scno->error(e.getMessage());
+		} catch (...) {
+			throw;
 		}
+	}
 	}
 
 	return false;
@@ -392,11 +397,11 @@ void CollisionManager::getWorldFloorCollisions(float x, float y, Zone* zone, Sor
 		if (aabbTree == NULL)
 			continue;
 
-		Ray ray = convertToModelSpace(rayStart, rayEnd, sceno);
+			Ray ray = convertToModelSpace(rayStart, rayEnd, sceno);
 
 		aabbTree->intersects(ray, 16384 * 2, *result);
+		}
 	}
-}
 
 void CollisionManager::getWorldFloorCollisions(float x, float y, Zone* zone, SortedVector<IntersectionResult>* result, const Vector<QuadTreeEntry*>& inRangeObjects) {
 	Vector3 rayStart(x, 16384.f, y);
@@ -410,11 +415,11 @@ void CollisionManager::getWorldFloorCollisions(float x, float y, Zone* zone, Sor
 		if (aabbTree == NULL)
 			continue;
 
-		Ray ray = convertToModelSpace(rayStart, rayEnd, sceno);
+			Ray ray = convertToModelSpace(rayStart, rayEnd, sceno);
 
 		aabbTree->intersects(ray, 16384 * 2, *result);
+		}
 	}
-}
 
 
 bool CollisionManager::checkLineOfSight(SceneObject* object1, SceneObject* object2) {

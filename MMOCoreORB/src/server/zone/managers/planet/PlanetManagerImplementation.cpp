@@ -191,6 +191,34 @@ void PlanetManagerImplementation::loadLuaConfig() {
 	if ((starportLandingTime = lua->getGlobalInt("starportLandingTime")) <= 0)
 	  starportLandingTime = 120;
 
+	ReadLocker rLock(&regionMap);
+	int numRegions = regionMap.getTotalRegions();
+	for(int i=0; i<numRegions; i++) {
+		CityRegion* city = regionMap.getRegion(i);
+
+		Reference<RecastNavMesh*> mesh = city->getNavMesh();
+		if(mesh == NULL || !mesh->isLoaded()) {
+			Locker locker(city);
+			city->createNavRegion(NavMeshManager::MeshQueue);
+		}
+	}
+
+	rLock.release();
+
+	if (pendingNavMeshes.size() > 0) {
+		for (int i = pendingNavMeshes.size() - 1; i >= 0; i--) {
+			NavMeshRegion* region = pendingNavMeshes.get(i);
+			region->updateNavMesh(region->getBoundingBox());
+
+			Locker lockRegion(region);
+			Locker locker(zone, region);
+
+			zone->transferObject(region, -1, false);
+
+			pendingNavMeshes.remove(i);
+		}
+	}
+
 	delete lua;
 	lua = NULL;
 }

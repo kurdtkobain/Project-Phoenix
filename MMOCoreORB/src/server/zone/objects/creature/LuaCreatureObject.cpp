@@ -100,6 +100,7 @@ Luna<LuaCreatureObject>::RegType LuaCreatureObject::Register[] = {
 		{ "setPvpStatusBitmask", &LuaTangibleObject::setPvpStatusBitmask},
 		{ "setPvpStatusBit", &LuaTangibleObject::setPvpStatusBit},
 		{ "isChangingFactionStatus", &LuaTangibleObject::isChangingFactionStatus },
+		{ "setFutureFactionStatus", &LuaTangibleObject::setFutureFactionStatus },
 		{ "addDotState", &LuaCreatureObject::addDotState},
 		{ "getSlottedObject", &LuaSceneObject::getSlottedObject},
 		{ "checkCooldownRecovery", &LuaCreatureObject::checkCooldownRecovery},
@@ -132,6 +133,10 @@ Luna<LuaCreatureObject>::RegType LuaCreatureObject::Register[] = {
 		{ "emptyStomach", &LuaCreatureObject::emptyStomach },
 		{ "getActivePetsSize", &LuaCreatureObject::getActivePetsSize },
 		{ "getActivePet", &LuaCreatureObject::getActivePet },
+		{ "isOnLeave", &LuaTangibleObject::isOnLeave },
+		{ "isOvert", &LuaTangibleObject::isOvert },
+		{ "isCovert", &LuaTangibleObject::isCovert },
+		{ "setFactionStatus", &LuaTangibleObject::setFactionStatus },
 		{ 0, 0 }
 };
 
@@ -1034,18 +1039,18 @@ int LuaCreatureObject::getActivePetsSize(lua_State* L) {
 	
 	lua_pushinteger(L, player->getActivePetsSize());
 	
-	return 1;	
+	return 1;
 }
 
 // Return a pointer to the specified pet
 // local pBob = CreatureObject(pPlayer):getActivePet(0)
 int LuaCreatureObject::getActivePet(lua_State* L) {
 	int petNumber = lua_tointeger(L, -1);
-	
+
 	petNumber = MAX(0, petNumber);
-	
+
 	Logger::console.info("petNumber: " + String::valueOf(petNumber), true);
-	
+
 	ManagedReference<PlayerObject*> player = realObject->getPlayerObject();
 	ManagedReference<CreatureObject*> pet = player->getActivePet(petNumber);
 	
@@ -1056,5 +1061,5 @@ int LuaCreatureObject::getActivePet(lua_State* L) {
 		
 	lua_pushlightuserdata(L, pet);
 
-	return 1;	
+	return 1;
 }

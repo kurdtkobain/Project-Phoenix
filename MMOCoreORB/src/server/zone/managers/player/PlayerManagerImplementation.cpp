@@ -983,77 +983,77 @@ void PlayerManagerImplementation::sendPlayerToCloner(CreatureObject* player, uin
 		zBroadcast << "\\#00e604" << playerName << " \\#e60000 Has Cloned At A Force Shrine!";
 		player->getZoneServer()->getChatManager()->broadcastGalaxy(NULL, zBroadcast.toString());
 	} else {
-		if (cloner == NULL) {
-			error("Cloning structure is null");
-			return;
-		}
+	if (cloner == NULL) {
+		error("Cloning structure is null");
+		return;
+	}
 
-		if (ghost == NULL)	{
-			error("The player to be cloned is null");
-			return;
-		}
+	if (ghost == NULL)	{
+		error("The player to be cloned is null");
+		return;
+	}
 
 
-		CloningBuildingObjectTemplate* cbot = cast<CloningBuildingObjectTemplate*>(cloner->getObjectTemplate());
+	CloningBuildingObjectTemplate* cbot = cast<CloningBuildingObjectTemplate*>(cloner->getObjectTemplate());
 
-		if (cbot == NULL) {
-			error("Not a cloning building template.");
-			return;
-		}
+	if (cbot == NULL) {
+		error("Not a cloning building template.");
+		return;
+	}
 
-		BuildingObject* cloningBuilding = cloner.castTo<BuildingObject*>();
+	BuildingObject* cloningBuilding = cloner.castTo<BuildingObject*>();
 
-		if (cloningBuilding == NULL)  {
-			error("Cloning building is null");
-			return;
-		}
+	if (cloningBuilding == NULL)  {
+		error("Cloning building is null");
+		return;
+	}
 
-		CloneSpawnPoint* clonePoint = cbot->getRandomSpawnPoint();
+	CloneSpawnPoint* clonePoint = cbot->getRandomSpawnPoint();
 
-		if (clonePoint == NULL) {
-			error("clone point null");
-			return;
-		}
+	if (clonePoint == NULL) {
+		error("clone point null");
+		return;
+	}
 
 		coordinate = clonePoint->getCoordinate();
 		direction = clonePoint->getDirection();
 
-		int cellID = clonePoint->getCellID();
+	int cellID = clonePoint->getCellID();
 
-		SceneObject* cell = cloningBuilding->getCell(cellID);
+	SceneObject* cell = cloningBuilding->getCell(cellID);
 
-		if (cell == NULL) {
-			StringBuffer msg;
-			msg << "null cell for cellID " << cellID << " in building: " << cbot->getFullTemplateString();
-			error(msg.toString());
-			return;
-		}
-		Zone* zone = player->getZone();
+	if (cell == NULL) {
+		StringBuffer msg;
+		msg << "null cell for cellID " << cellID << " in building: " << cbot->getFullTemplateString();
+		error(msg.toString());
+		return;
+	}
+	Zone* zone = player->getZone();
 
-		player->switchZone(zone->getZoneName(), coordinate->getPositionX(), coordinate->getPositionZ(), coordinate->getPositionY(), cell->getObjectID());
+	player->switchZone(zone->getZoneName(), coordinate->getPositionX(), coordinate->getPositionZ(), coordinate->getPositionY(), cell->getObjectID());
 
-		uint64 preDesignatedFacilityOid = ghost->getCloningFacility();
-		ManagedReference<SceneObject*> preDesignatedFacility = server->getObject(preDesignatedFacilityOid);
+	uint64 preDesignatedFacilityOid = ghost->getCloningFacility();
+	ManagedReference<SceneObject*> preDesignatedFacility = server->getObject(preDesignatedFacilityOid);
 
 		if (preDesignatedFacility == NULL || preDesignatedFacility != cloningBuilding || name.toLowerCase().contains("shrine")) {
-			player->addWounds(CreatureAttribute::HEALTH, 100, true, false);
-			player->addWounds(CreatureAttribute::ACTION, 100, true, false);
-			player->addWounds(CreatureAttribute::MIND, 100, true, false);
-			player->addShockWounds(100, true);
+		player->addWounds(CreatureAttribute::HEALTH, 100, true, false);
+		player->addWounds(CreatureAttribute::ACTION, 100, true, false);
+		player->addWounds(CreatureAttribute::MIND, 100, true, false);
+		player->addShockWounds(100, true);
 			VisibilityManager::instance()->clearVisibility(player);
 			//Broadcast to Server
 			String playerName = player->getFirstName();
 			StringBuffer zBroadcast;
 			zBroadcast << "\\#00e604" << playerName << " \\#e60000 Has Been Slaughtered!";
 			player->getZoneServer()->getChatManager()->broadcastGalaxy(NULL, zBroadcast.toString());
-		}
+	}
 	}
 
 	if (player->hasSkill("force_rank_dark_novice") || player->hasSkill("force_rank_light_novice")) {
 		ghost->setFactionStatus(2);
 	} else {
-		if (ghost->hasPvpTef())
-			ghost->schedulePvpTefRemovalTask(true);
+	if (ghost->hasPvpTef())
+		ghost->schedulePvpTefRemovalTask(true);
 	}
 
 
@@ -5210,7 +5210,7 @@ void PlayerManagerImplementation::enhanceCharacter(CreatureObject* player) {
 
 	if (message && player->isPlayerCreature())
 		player->sendSystemMessage("An unknown force strengthens you for battles yet to come.");
-	}
+}
 }
 
 void PlayerManagerImplementation::sendAdminJediList(CreatureObject* player) {

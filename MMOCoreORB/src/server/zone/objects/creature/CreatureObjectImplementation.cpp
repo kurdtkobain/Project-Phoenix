@@ -2899,7 +2899,7 @@ bool CreatureObjectImplementation::isAttackableBy(TangibleObject* object, bool b
 		return false;
 
 	// if player is on leave, then faction object cannot attack it
-	if (ghost->getFactionStatus() == FactionStatus::ONLEAVE || getFaction() == 0)
+	if (getFactionStatus() == FactionStatus::ONLEAVE || getFaction() == 0)
 		return false;
 
 	// if tano is overt, creature must be overt
@@ -2948,11 +2948,8 @@ bool CreatureObjectImplementation::isAttackableBy(CreatureObject* object, bool b
 
 		if(getFaction() == 0 || getFaction() == object->getFaction())
 			return false;
-		else if (isPlayerCreature()) {
-
-			if(getPlayerObject() == NULL || getPlayerObject()->getFactionStatus() == FactionStatus::ONLEAVE)
-				return false;
-		}
+		else if (isPlayerCreature() && getFactionStatus() == FactionStatus::ONLEAVE)
+			return false;
 
 		return true;
 	}
@@ -3009,21 +3006,13 @@ bool CreatureObjectImplementation::isHealableBy(CreatureObject* object) {
 
 	//if ((pvpStatusBitmask & CreatureFlag::OVERT) && (object->getPvpStatusBitmask() & CreatureFlag::OVERT) && object->getFaction() != getFaction())
 
-	PlayerObject* targetGhost = getPlayerObject();
+	CreatureObject* targetCreo = asCreatureObject();
 
-	if (isPet()) {
-		ManagedReference<CreatureObject*> owner = getLinkedCreature().get();
-		if (owner != NULL)
-			targetGhost = owner->getPlayerObject();
-		else
-			targetGhost = NULL;
-	}
+	if (isPet())
+		targetCreo = getLinkedCreature().get();
 
-	if (targetGhost == NULL)
-		return true;
-
-	uint32 targetFactionStatus = targetGhost->getFactionStatus();
-	uint32 currentFactionStatus = ghost->getFactionStatus();
+	uint32 targetFactionStatus = targetCreo->getFactionStatus();
+	uint32 currentFactionStatus = object->getFactionStatus();
 
 	if (getFaction() != object->getFaction() && !(targetFactionStatus == FactionStatus::ONLEAVE))
 		return false;

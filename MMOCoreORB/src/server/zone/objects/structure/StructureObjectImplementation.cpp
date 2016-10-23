@@ -50,6 +50,48 @@ void StructureObjectImplementation::initializeTransientMembers() {
 void StructureObjectImplementation::finalize() {
 }
 
+void StructureObjectImplementation::createNavRegion() {
+
+	navmeshRegion = zone->getZoneServer()->createObject(STRING_HASHCODE("object/region_navmesh.iff"),
+														isPersistent()).castTo<NavMeshRegion *>();
+
+	if (navmeshRegion == NULL || !navmeshRegion->isRegion()) {
+		error("Failed to create navmesh region");
+		return;
+	}
+
+	Locker clocker(navmeshRegion, _this.getReferenceUnsafeStaticCast());
+
+	String name = String::valueOf(getObjectID());
+
+	float length = 32.0f;
+
+	for(const auto& child : childObjects) {
+		const BaseBoundingVolume* boundingVolume = child->getBoundingVolume();
+		if (boundingVolume) {
+			const AABB& box = boundingVolume->getBoundingBox();
+			float distance = (child->getWorldPosition() - getWorldPosition()).length();
+			float radius = box.extents()[box.longestAxis()];
+			if(distance + radius > length)
+				length = radius;
+		}
+	}
+
+	const BaseBoundingVolume* boundingVolume = getBoundingVolume();
+	if (boundingVolume) {
+		const AABB& box = boundingVolume->getBoundingBox();
+		float radius = box.extents()[box.longestAxis()];
+		if(radius > length)
+			length = radius;
+	}
+
+	Vector3 position = Vector3(getPositionX(), 0, getPositionY());
+	// This is invoked when a new faction base is placed, always force a rebuild
+	navmeshRegion->initializeNavRegion(position, length * 1.25f, zone, name, true, true);
+
+	zone->transferObject(navmeshRegion, -1, false);
+}
+
 void StructureObjectImplementation::notifyLoadFromDatabase() {
 	TangibleObjectImplementation::notifyLoadFromDatabase();
 

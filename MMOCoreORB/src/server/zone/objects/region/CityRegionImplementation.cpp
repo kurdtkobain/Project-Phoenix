@@ -57,6 +57,16 @@ void CityRegionImplementation::notifyLoadFromDatabase() {
 
 	if (isRegistered())
 		zone->getPlanetManager()->addRegion(_this.getReferenceUnsafeStaticCast());
+
+	ZoneServer *zServer = ServerCore::getZoneServer();
+	if (zServer != NULL) {
+		bool destroyNavRegions = zServer->shouldDeleteNavRegions();
+
+		if (destroyNavRegions) {
+			destroyNavRegion();
+			createNavRegion();
+		}
+	}
 }
 
 void CityRegionImplementation::initialize() {
@@ -109,7 +119,7 @@ Region* CityRegionImplementation::addRegion(float x, float y, float radius, bool
 	if (obj == NULL || !obj->isRegion()) {
 		return NULL;
 	}
-	
+
 	Locker clocker(obj, _this.getReferenceUnsafeStaticCast());
 
 	ManagedReference<Region*> region = cast<Region*>(obj.get());
@@ -414,9 +424,106 @@ bool CityRegionImplementation::hasZoningRights(uint64 objectid) {
 	return (now.getTime() <= timestamp);
 }
 
-void CityRegionImplementation::setZone(Zone* zne) {
-	zone = zne;
+void CityRegionImplementation::createNavRegion() {
+	// This is invoked when a new city hall is placed, always force a rebuild
+    createNavRegion(NavMeshManager::TileQueue, true);
 }
+
+void CityRegionImplementation::destroyNavRegion() {
+	if (navmeshRegion != NULL) {
+		Locker locker(navmeshRegion);
+		navmeshRegion->destroyObjectFromWorld(true);
+		navmeshRegion = NULL;
+	}
+}
+
+void CityRegionImplementation::createNavRegion(const String& queue, bool forceRebuild) {
+
+	if (forceRebuild)
+		destroyNavRegion();
+
+	bool clientRegion = isClientRegion();
+
+    if(navmeshRegion != NULL) {
+        RecastNavMesh* mesh = getNavMesh();
+        if(mesh == NULL || !mesh->isLoaded()) {
+            Core::getTaskManager()->executeTask([=] {
+                updateNavmesh(navmeshRegion->getBoundingBox(), queue);
+            }, "cityregion_navmesh_update");
+            return;
+        }
+    }
+    navmeshRegion = zone->getZoneServer()->createObject(STRING_HASHCODE("object/region_navmesh.iff"),
+															!clientRegion).castTo<NavMeshRegion *>();
+
+    if (navmeshRegion == NULL || !navmeshRegion->isRegion()) {
+        error("Failed to create navmesh region");
+        return;
+    }
+
+	Locker clocker(navmeshRegion, _this.getReferenceUnsafeStaticCast());
+
+	String name = getRegionName();
+	name = name.subString(name.lastIndexOf(':')+1);
+
+	if(isClientRegion()) {
+		Vector3 center;
+
+		float minx = 30000;
+		float miny = 30000;
+		float minz = 30000;
+
+		float maxx = -30000;
+		float maxy = -30000;
+		float maxz = -30000;
+
+		// Build Extents (Always Square)
+		for (Reference<Region*>& region : regions) {
+
+			if (region == NULL)
+				continue;
+
+			//const Sphere &sphere = region->regionBounds.get(s);
+			const float &radius = region->getRadius();
+			const Vector3 &vert = region->getWorldPosition();
+			const float &x = vert.getX();
+			const float &y = vert.getY();
+			const float &z = vert.getZ();
+
+			if (x + radius > maxx)
+				maxx = x + radius;
+
+			if (y + radius > maxy)
+				maxy = y + radius;
+
+			if (z + radius > maxz)
+				maxz = z + radius;
+
+			if (x - radius < minx)
+				minx = x - radius;
+
+			if (y - radius < miny)
+				miny = y - radius;
+
+			if (z - radius < minz)
+				minz = z - radius;
+		}
+
+		AABB box(Vector3(minx, miny, minz), Vector3(maxx, maxy, maxz));
+		Vector3 position = Vector3(box.center()[0], 0, box.center()[1]);
+		navmeshRegion->disableMeshUpdates(true);
+		navmeshRegion->initializeNavRegion(position, box.extents()[box.longestAxis()], zone, name, true, forceRebuild);
+	} else {
+		Vector3 position = Vector3(getPositionX(), 0, getPositionY());
+		navmeshRegion->initializeNavRegion(position, 480.0f, zone, name, true, forceRebuild);
+	}
+
+	zone->transferObject(navmeshRegion, -1, false);
+}
+
+void CityRegionImplementation::setZone(Zone* zne) {
+        zone = zne;
+    }
 
 void CityRegionImplementation::setRadius(float rad) {
 	if (regions.size() <= 0)

@@ -534,14 +534,26 @@ void ZoneComponent::destroyObjectFromWorld(SceneObject* sceneObject, bool sendSe
 				Locker _alocker(sceneObject->getContainerLock());
 				ManagedReference<ActiveArea*> area = activeAreas->get(0);
 				activeAreas->remove(0);
-			
+
 				_alocker.release();
-			
+
 				area->enqueueExitEvent(sceneObject);
 			}
-		}
-	}
-}
+		} else if (sceneObject->isStaticObjectClass()) {
+			// hack to get around notifyEnter/Exit only working with tangible objects
+			Vector3 worldPos = sceneObject->getWorldPosition();
+			SortedVector<ActiveArea* > objects;
+			rootZone->getInRangeActiveAreas(worldPos.getX(), worldPos.getY(), 5, &objects, false);
+
+			for(auto& area : objects) {
+				if(area->isNavRegion()) {
+					NavMeshRegion *mesh = area->asNavRegion();
+
+					if(mesh->containsPoint(worldPos.getX(), worldPos.getY())) {
+						mesh->updateNavMesh(sceneObject, true);
+					}
+				}
+			}
 
 void ZoneComponent::notifySelfPositionUpdate(SceneObject* sceneObject) const {
 	sceneObject->notifySelfPositionUpdate();

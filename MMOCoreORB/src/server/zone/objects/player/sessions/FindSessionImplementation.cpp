@@ -152,5 +152,75 @@ void FindSessionImplementation::findPlanetaryObject(String& maplocationtype) {
 
 	addWaypoint(objX, objY, wptName);
 
+	WorldCoordinates start(player);
+	WorldCoordinates end(object);
+
+	SortedVector<ManagedReference<NavMeshRegion*> > regions;
+	//fetch nav meshes near the target position
+	zone->getInRangeNavMeshes(end.getX(), end.getY(), 5, &regions, false);
+
+	bool withinNavMesh = false;
+
+	for (const auto& mesh : regions) {
+		// test to see if our player is within the same nav mesh
+		if (mesh->containsPoint(start.getX(), start.getY())) {
+			withinNavMesh = true;
+			break;
+		}
+	}
+
+	if (withinNavMesh) {
+		Vector <WorldCoordinates> entrances;
+		Reference < Vector < WorldCoordinates > * > path = NULL;
+
+		if (object->isBuildingObject()) {
+			BuildingObject* building = object->asBuildingObject();
+			SharedBuildingObjectTemplate* templateData = static_cast<SharedBuildingObjectTemplate*>(object->getObjectTemplate());
+			PortalLayout* portalLayout = templateData->getPortalLayout();
+
+			if (portalLayout != NULL) {
+				const Vector <CellProperty>& cells = portalLayout->getCellProperties();
+				if (cells.size() > 0) {
+					const CellProperty& cell = cells.get(0);
+					for (int i = 0; i < cell.getNumberOfPortals(); i++) {
+						const CellPortal* portal = cell.getPortal(i);
+						const AABB& box = portalLayout->getPortalBounds(portal->getGeometryIndex());
+
+						Vector3 center = box.center();
+						center.setZ(center.getZ() + 5.0f);
+						Matrix4 transform;
+						transform.setRotationMatrix(building->getDirection()->toMatrix3());
+						transform.setTranslation(building->getPositionX(), building->getPositionZ(),
+												 -building->getPositionY());
+
+						Vector3 dPos = (Vector3(center.getX(), center.getY(), -center.getZ()) * transform);
+						entrances.add(WorldCoordinates(Vector3(dPos.getX(), -dPos.getZ(), dPos.getY()), NULL));
+					}
+					path = PathFinderManager::instance()->findPathFromWorldToWorld(start, entrances, zone, false);
+				}
+			}
+		}
+
+		if (path == NULL) {
+			path = PathFinderManager::instance()->findPath(start, end, zone);
+		}
+
+		if (path && path->size()) {
+			CreateClientPathMessage* msg = new CreateClientPathMessage();
+			for (int i = 0; i < path->size(); i++) {
+				const WorldCoordinates& point = path->get(i);
+				msg->addCoordinate(point.getX(), point.getZ(), point.getY());
+			}
+
+			if (wpt != NULL) {
+				PlayerObject* ghost = player->getPlayerObject();
+				if (ghost != NULL)
+					ghost->setClientPathWaypoint(wpt);
+			}
+
+			player->sendMessage(msg);
+		}
+	}
+
 	cancelSession();
 }

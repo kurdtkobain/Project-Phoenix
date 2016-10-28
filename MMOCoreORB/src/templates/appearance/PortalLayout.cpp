@@ -1,4 +1,4 @@
-/*
+	/*
  * PortalLayout.cpp
  *
  *  Created on: 03/12/2010
@@ -11,6 +11,142 @@
 #include "templates/appearance/FloorMesh.h"
 #include "engine/util/u3d/AStarAlgorithm.h"
 
+void PortalLayout::readPortalGeometry0003(IffStream *iff, int numPortals) {
+
+	for(int i=0; i<numPortals; i++) {
+		iff->openChunk('PRTL');
+		uint32 size = iff->getUnsignedInt();
+
+		Reference<PortalGeometry*> portal = new PortalGeometry();
+		Reference<MeshData*> mesh = portal->getGeometry();
+		Vector<Vector3> *verts = mesh->getVerts();
+		Vector<MeshTriangle> *tris = mesh->getTriangles();
+
+		Vector3 min(50000, 50000, 50000);
+		Vector3 max(-50000, -50000, -50000);
+
+		for (int i=0; i<size; i++) {
+			float x = iff->getFloat();
+			float y = iff->getFloat();
+			float z = iff->getFloat();
+
+			if(x < min.getX())
+				min.setX(x);
+
+			if(x > max.getX())
+				max.setX(x);
+
+			if(y < min.getY())
+				min.setY(y);
+
+			if (y > max.getY())
+				max.setY(y);
+
+			if (z < min.getZ())
+				min.setZ(z);
+
+			if (z > max.getZ())
+				max.setZ(z);
+
+			Vector3 vert(x, y, z);
+			verts->add(vert);
+		}
+
+		iff->closeChunk('PRTL');
+		portal->setBoundingBox(AABB(min, max));
+		Vector3 center = portal->getBoundingBox().center();
+
+		for (int i=0; i<size; i++) {
+			Vector3 &vert = verts->get(i);
+
+			vert = center + ((vert - center) * 1.1);
+
+			// Triangle fan
+			if ( i >= 2) {
+				MeshTriangle triA;
+				triA.set(2, 0);
+				triA.set(1, i-1);
+				triA.set(0, i);
+				tris->add(triA);
+
+				MeshTriangle triB;
+				triB.set(0, 0);
+				triB.set(1, i-1);
+				triB.set(2, i);
+				tris->add(triB);
+			}
+		}
+		portalGeometry.add(portal);
+	}
+}
+
+
+void PortalLayout::readPortalGeometry0004(IffStream *iff, int numPortals) {
+
+	for(int i=0; i<numPortals; i++) {
+		iff->openForm('IDTL');
+		iff->openForm('0000');
+		Chunk *vertChunk = iff->openChunk('VERT');
+		uint32 size = vertChunk->getChunkSize() / 12;
+
+		Reference<PortalGeometry*> portal = new PortalGeometry();
+		Reference<MeshData*> mesh = portal->getGeometry();
+		Vector<Vector3> *verts = mesh->getVerts();
+		Vector<MeshTriangle> *tris = mesh->getTriangles();
+
+		Vector3 min(50000, 50000, 50000);
+		Vector3 max(-50000, -50000, -50000);
+
+		for (int i=0; i<size; i++) {
+			float x = iff->getFloat();
+			float y = iff->getFloat();
+			float z = iff->getFloat();
+
+			if(x < min.getX())
+				min.setX(x);
+
+			if(x > max.getX())
+				max.setX(x);
+
+			if(y < min.getY())
+				min.setY(y);
+
+			if (y > max.getY())
+				max.setY(y);
+
+			if (z < min.getZ())
+				min.setZ(z);
+
+			if (z > max.getZ())
+				max.setZ(z);
+
+			Vector3 vert(x, y, z);
+			verts->add(vert);
+		}
+
+		iff->closeChunk('VERT');
+
+		portal->setBoundingBox(AABB(min, max));
+		Vector3 center = portal->getBoundingBox().center();
+
+		Chunk *indxChunk = iff->openChunk('INDX');
+
+		uint32 numIdx = indxChunk->getChunkSize() / 12;
+
+		for (int i=0; i<numIdx; i++) {
+			int a = iff->getInt();
+			int b = iff->getInt();
+			int c = iff->getInt();
+			tris->add(MeshTriangle(c, b, a));
+		}
+
+		iff->closeChunk('INDX');
+		iff->closeForm('0000');
+		iff->closeForm('IDTL');
+
+		portalGeometry.add(portal);
+	}
+}
 PortalLayout::PortalLayout() {
 	pathGraph = NULL;
 
@@ -47,7 +183,11 @@ void PortalLayout::parse(IffStream* iffStream) {
 
 		iffStream->openForm('PRTS');
 
-		//skipping PRTS
+		if (type == '0003')
+			readPortalGeometry0003(iffStream, numPortals);
+		else
+			readPortalGeometry0004(iffStream, numPortals);
+
 		iffStream->closeForm('PRTS');
 
 		//open CELS form
@@ -156,7 +296,7 @@ void PortalLayout::parseCELSForm(IffStream* iffStream) {
 			CellProperty cell(cellProperties.size());
 
 			try {
-				cell.readObject(iffStream);
+			cell.readObject(iffStream);
 			} catch (Exception& e) {
 				error(e.getMessage());
 			} catch (...) {

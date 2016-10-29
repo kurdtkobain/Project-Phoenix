@@ -187,16 +187,14 @@ void SchematicMap::buildSchematicGroups() {
 }
 
 bool SchematicMap::addSchematics(PlayerObject* playerObject,
-		Vector<String> schematicgroups, bool updateClient) {
+		const Vector<String>& schematicgroups, bool updateClient) {
 
 	Vector<ManagedReference<DraftSchematic* > > schematics;
 
 	for (int i = 0; i < schematicgroups.size(); ++i) {
-
-		String groupName = schematicgroups.get(i);
+		const String& groupName = schematicgroups.get(i);
 
 		if (groupMap.contains(groupName)) {
-
 			DraftSchematicGroup* dsg = groupMap.get(groupName);
 
 			for(int j = 0; j < dsg->size(); ++j)
@@ -211,13 +209,12 @@ bool SchematicMap::addSchematics(PlayerObject* playerObject,
 }
 
 void SchematicMap::removeSchematics(PlayerObject* playerObject,
-		Vector<String> schematicgroups, bool updateClient) {
+		const Vector<String>& schematicgroups, bool updateClient) {
 
 	Vector<ManagedReference<DraftSchematic* > > schematics;
 
 	for (int i = 0; i < schematicgroups.size(); ++i) {
-
-		String groupName = schematicgroups.get(i);
+		const String& groupName = schematicgroups.get(i);
 
 		if (groupMap.contains(groupName)) {
 

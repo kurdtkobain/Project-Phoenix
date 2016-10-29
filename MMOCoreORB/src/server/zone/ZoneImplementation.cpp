@@ -174,6 +174,54 @@ void ZoneImplementation::inRange(QuadTreeEntry* entry, float range) {
 	quadTree->safeInRange(entry, range);
 }
 
+int ZoneImplementation::getInRangeSolidObjects(float x, float y, float range, SortedVector<ManagedReference<QuadTreeEntry*> >* objects, bool readLockZone) {
+	bool readlock = readLockZone && !_this.getReferenceUnsafeStaticCast()->isLockedByCurrentThread();
+
+	try {
+		_this.getReferenceUnsafeStaticCast()->rlock(readlock);
+
+		quadTree->inRange(x, y, range, *objects);
+
+		_this.getReferenceUnsafeStaticCast()->runlock(readlock);
+	} catch (...) {
+		_this.getReferenceUnsafeStaticCast()->runlock(readlock);
+	}
+
+	if (objects->size() > 0) {
+		for (int i = objects->size()-1; i >= 0; i--) {
+			SceneObject* sceno = cast<SceneObject*>(objects->get(i).get());
+
+			if (sceno == NULL || sceno->getParentID() != 0) {
+				objects->remove(i);
+				continue;
+			}
+
+			if (sceno->isCreatureObject() || sceno->isLairObject()) {
+				objects->remove(i);
+				continue;
+			}
+
+			if (sceno->getGameObjectType() == SceneObjectType::FURNITURE) {
+				objects->remove(i);
+				continue;
+			}
+
+			SharedObjectTemplate *shot = sceno->getObjectTemplate();
+
+			if (shot == NULL) {
+				objects->remove(i);
+				continue;
+			}
+
+			if (!shot->getCollisionMaterialFlags() || !shot->getCollisionMaterialBlockFlags() || !shot->isNavUpdatesEnabled()) {
+				objects->remove(i);
+				continue;
+			}
+		}
+	}
+	return objects->size();
+}
+
 int ZoneImplementation::getInRangeObjects(float x, float y, float range, SortedVector<ManagedReference<QuadTreeEntry*> >* objects, bool readLockZone) {
 	bool readlock = readLockZone && !_this.getReferenceUnsafeStaticCast()->isLockedByCurrentThread();
 

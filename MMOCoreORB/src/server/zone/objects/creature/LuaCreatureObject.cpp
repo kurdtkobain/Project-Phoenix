@@ -17,6 +17,7 @@
 #include "server/zone/objects/player/PlayerObject.h"
 #include "server/zone/managers/player/PlayerManager.h"
 #include "server/zone/managers/skill/SkillManager.h"
+#include "server/zone/objects/tangible/threat/ThreatMap.h"
 
 const char LuaCreatureObject::className[] = "LuaCreatureObject";
 
@@ -137,6 +138,8 @@ Luna<LuaCreatureObject>::RegType LuaCreatureObject::Register[] = {
 		{ "isOvert", &LuaTangibleObject::isOvert },
 		{ "isCovert", &LuaTangibleObject::isCovert },
 		{ "setFactionStatus", &LuaTangibleObject::setFactionStatus },
+		{ "getDamageDealerList", &LuaCreatureObject::getDamageDealerList },
+		{ "getHealingThreatList", &LuaCreatureObject::getHealingThreatList},
 		{ 0, 0 }
 };
 
@@ -1060,6 +1063,50 @@ int LuaCreatureObject::getActivePet(lua_State* L) {
 	}
 		
 	lua_pushlightuserdata(L, pet);
+
+	return 1;
+}
+
+int LuaCreatureObject::getDamageDealerList(lua_State* L) {
+	ThreatMap* threatMap = realObject->getThreatMap();
+	ThreatMap copyThreatMap(*threatMap);
+
+	lua_newtable(L);
+
+	int count = 0;
+	for (int i = 0; i < copyThreatMap.size(); ++i) {
+		ThreatMapEntry* entry = &copyThreatMap.elementAt(i).getValue();
+
+		if (entry->getTotalDamage() > 0) {
+			CreatureObject* attacker = copyThreatMap.elementAt(i).getKey();
+
+			count++;
+			lua_pushlightuserdata(L, attacker);
+			lua_rawseti(L, -2, count);
+		}
+	}
+
+	return 1;
+}
+
+int LuaCreatureObject::getHealingThreatList(lua_State* L) {
+	ThreatMap* threatMap = realObject->getThreatMap();
+	ThreatMap copyThreatMap(*threatMap);
+
+	lua_newtable(L);
+
+	int count = 0;
+	for (int i = 0; i < copyThreatMap.size(); ++i) {
+		ThreatMapEntry* entry = &copyThreatMap.elementAt(i).getValue();
+
+		if (entry->getHeal() > 0) {
+			CreatureObject* healer = copyThreatMap.elementAt(i).getKey();
+
+			count++;
+			lua_pushlightuserdata(L, healer);
+			lua_rawseti(L, -2, count);
+		}
+	}
 
 	return 1;
 }

@@ -80,6 +80,9 @@
 #include "server/zone/objects/tangible/powerup/PowerupObject.h"
 #include "server/zone/objects/resource/ResourceSpawn.h"
 #include "server/zone/objects/tangible/component/Component.h"
+#include "server/zone/objects/pathfinding/NavMeshRegion.h"
+#include "server/zone/managers/collision/NavMeshManager.h"
+
 
 int DirectorManager::DEBUG_MODE = 0;
 int DirectorManager::ERROR_CODE = NO_ERROR;
@@ -127,9 +130,9 @@ void DirectorManager::loadPersistentEvents() {
 			Reference<PersistentEvent*> event = Core::getObjectBroker()->lookUp(objectID).castTo<PersistentEvent*>();
 			++i;
 
-						Reference<PersistentEvent*> oldEvent = persistentEvents.put(event->getEventName().hashCode(), event);
- 
- 			if (event != NULL && oldEvent != NULL) {
+			Reference<PersistentEvent*> oldEvent = persistentEvents.put(event->getEventName().hashCode(), event);
+
+			if (event != NULL && oldEvent != NULL) {
 				error("duplicate persistent event " + event->getEventName() + " loading from database!");
 			} else if (event != NULL) {
 				event->loadTransientTask();
@@ -347,7 +350,10 @@ void DirectorManager::initializeLuaEngine(Lua* luaEngine) {
 	lua_register(luaEngine->getLuaState(), "getQuestVectorMap", getQuestVectorMap);
 	lua_register(luaEngine->getLuaState(), "createQuestVectorMap", createQuestVectorMap);
 	lua_register(luaEngine->getLuaState(), "removeQuestVectorMap", removeQuestVectorMap);
-	lua_register(luaEngine->getLuaState(), "adminPlaceStructure", adminPlaceStructure);
+	lua_register(luaEngine->getLuaState(), "creatureTemplateExists", creatureTemplateExists);
+
+	//Navigation Mesh Management
+	lua_register(luaEngine->getLuaState(), "createNavMesh", createNavMesh);
 
 	luaEngine->setGlobalInt("POSITIONCHANGED", ObserverEventType::POSITIONCHANGED);
 	luaEngine->setGlobalInt("CLOSECONTAINER", ObserverEventType::CLOSECONTAINER);
@@ -1284,11 +1290,11 @@ int DirectorManager::spatialMoodChat(lua_State* L) {
 	if (lua_isuserdata(L, -3)) {
 		StringIdChatParameter* message = (StringIdChatParameter*)lua_touserdata(L, -3);
 
-		chatManager->broadcastChatMessage(creature, *message, 0, moodType, chatType);
+		chatManager->broadcastChatMessage(creature, *message, 0, chatType, moodType);
 	} else {
 		String message = lua_tostring(L, -3);
 
-		chatManager->broadcastChatMessage(creature, message, 0, moodType, chatType);
+		chatManager->broadcastChatMessage(creature, message, 0, chatType, moodType);
 	}
 
 	return 0;
@@ -2397,8 +2403,9 @@ ConversationScreen* DirectorManager::runScreenHandlers(const String& luaClass, C
 void DirectorManager::activateEvent(ScreenPlayTask* task) {
 	ManagedReference<SceneObject*> obj = task->getSceneObject();
 	const String& play = task->getScreenPlay();
- 	const String& key = task->getTaskKey();
- 	const String& args = task->getArgs();
+	const String& key = task->getTaskKey();
+	const String& args = task->getArgs();
+
 	Reference<PersistentEvent*> persistentEvent = task->getPersistentEvent();
 
 	if (persistentEvent != NULL) {
@@ -2419,7 +2426,7 @@ void DirectorManager::activateEvent(ScreenPlayTask* task) {
 	try {
 		LuaFunction startScreenPlay(lua->getLuaState(), play, key, 0);
 		startScreenPlay << obj.get();
- 		startScreenPlay << args.toCharArray();
+		startScreenPlay << args.toCharArray();
 
 		startScreenPlay.callFunction();
 	} catch (Exception& e) {
@@ -2658,9 +2665,9 @@ int DirectorManager::getSpawnPoint(lua_State* L) {
 
 	if (zone == NULL) {
 		String err = "Zone is NULL in DirectorManager::getSpawnPoint. zoneName = " + zoneName;
- 		luaL_traceback(L, L, err.toCharArray(), 0);
- 		String trace = lua_tostring(L, -1);
- 		instance()->error(trace);
+		luaL_traceback(L, L, err.toCharArray(), 0);
+		String trace = lua_tostring(L, -1);
+		instance()->error(trace);
 		return 0;
 	}
 
@@ -3207,34 +3214,61 @@ void DirectorManager::removeQuestVectorMap(const String& keyString) {
 		ObjectManager::instance()->destroyObjectFromDatabase(questMap->_getObjectID());
 }
 
-int DirectorManager::adminPlaceStructure(lua_State* L) {
-	Reference<CreatureObject*> creature = (CreatureObject*)lua_touserdata(L, -2);
-	String templateString = lua_tostring(L, -1);
+int DirectorManager::createNavMesh(lua_State *L) {
 
-	ManagedReference<Zone*> zone = creature->getZone();
+    if (checkArgumentCount(L, 6) == 1) {
+        instance()->error("incorrect number of arguments passed to DirectorManager::createNavMesh");
+        ERROR_CODE = INCORRECT_ARGUMENTS;
+        return 0;
+    }
+    String name  = lua_tostring(L, -1);
+    bool dynamic = lua_toboolean(L, -2);
+    float radius = lua_tonumber(L, -3);
+    float z      = lua_tonumber(L, -4);
+    float x      = lua_tonumber(L, -5);
+    String zoneName  = lua_tostring(L, -6);
 
-	if (zone == NULL)
+    Zone* zone = ServerCore::getZoneServer()->getZone(zoneName);
+
+    if (zone == NULL) {
+       instance()-> error("Zone == NULL in DirectorManager::createNavMesh (" + zoneName + ")");
+        ERROR_CODE = INCORRECT_ARGUMENTS;
+        return 0;
+    }
+
+    ManagedReference<NavMeshRegion*> navmeshRegion = ServerCore::getZoneServer()->createObject(STRING_HASHCODE("object/region_navmesh.iff"), 0).castTo<NavMeshRegion*>();
+    if (name.length() == 0) {
+        name = String::valueOf(navmeshRegion->getObjectID());
+    }
+
+    Core::getTaskManager()->scheduleTask([=]{
+        String str = name;
+        Vector3 position = Vector3(x, 0, z);
+
+		Locker locker(navmeshRegion);
+
+        navmeshRegion->disableMeshUpdates(!dynamic);
+        navmeshRegion->initializeNavRegion(position, radius, zone, str);
+        zone->transferObject(navmeshRegion, -1, false);
+    }, "create_lua_navmesh", 1000);
+    lua_pushlightuserdata(L, navmeshRegion);
+    return 1;
+}
+
+
+
+int DirectorManager::creatureTemplateExists(lua_State* L) {
+	if (checkArgumentCount(L, 1) == 1) {
+		instance()->error("incorrect number of arguments passed to DirectorManager::creatureTemplateExists");
+		ERROR_CODE = INCORRECT_ARGUMENTS;
 		return 0;
-
-	if (creature->getParent() != NULL) {
-			DirectorManager::instance()->error("adminPlaceStructure - You were not outside.");
-			return 0;
 	}
 
-	int angle = creature->getDirectionAngle();
+	String templateName = lua_tostring(L, -1);
 
-	if (templateString.contains("housing_tatt_style02_med") || templateString.contains("player/city/cloning") || templateString.contains("player/city/hospital"))
-		angle -= 90; // Correct unusual default POB rotation
+	bool result = CreatureTemplateManager::instance()->getTemplate(templateName) != NULL;
 
-	if (templateString.contains("guild_theater"))
-		angle -= 180; // Correct unusual default POB rotation
+	lua_pushboolean(L, result);
 
-	float x = creature->getPositionX();
-	float y = creature->getPositionY();
-	int persistenceLevel = 1;
-
-	// Create Structure
-	StructureObject* structureObject = StructureManager::instance()->placeStructure(creature, templateString, x, y, angle, persistenceLevel);
-
-	return 0;
+	return 1;
 }
